@@ -26,6 +26,7 @@ struct Tag {
 	int numClients;
 	int focusedClient;
 	BarComponent component;
+    bool visible;
 };
 
 struct Monitor;
