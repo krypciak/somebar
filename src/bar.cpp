@@ -87,8 +87,9 @@ Bar::Bar()
 	if (!_pangoContext) {
 		die("pango_font_map_create_context");
 	}
-	for (const auto& tagName : tagNames) {
-		_tags.push_back({ TagState::None, 0, 0, createComponent(tagName) });
+    for(long unsigned int i = 0; i < tagNames.size(); i++) {
+        const auto& tagName = tagNames[i];
+		_tags.push_back({ TagState::None, 0, 0, createComponent(tagName), defaultTagVisibility[i] });
 	}
 	_layoutCmp = createComponent();
 	_titleCmp = createComponent();
@@ -140,6 +141,7 @@ void Bar::setTag(int tag, int state, int numClients, int focusedClient)
 	t.state = state;
 	t.numClients = numClients;
 	t.focusedClient = focusedClient;
+    t.visible = numClients != 0 || defaultTagVisibility[tag] ;
 }
 
 void Bar::setSelected(bool selected)
@@ -241,6 +243,7 @@ void Bar::render()
 void Bar::renderTags()
 {
 	for (auto &tag : _tags) {
+        if(!tag.visible) continue;
 		setColorScheme(
 			tag.state & TagState::Active ? colorActive : colorInactive,
 			tag.state & TagState::Urgent);
@@ -313,3 +316,4 @@ BarComponent Bar::createComponent(const std::string &initial)
 	res.setText(initial);
 	return res;
 }
+
