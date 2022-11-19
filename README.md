@@ -1,3 +1,8 @@
+# This is a fork of [~raphi/somebar](https://git.sr.ht/~raphi/somebar)
+Things I changes:
+1. Hide tags when they have no clients when spefified   
+
+Original README.md:  
 # somebar - dwm-like bar for dwl
 
 ![Screenshot](screenshot.png)
