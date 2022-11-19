@@ -17,10 +17,13 @@ constexpr ColorScheme colorActive = {Color(0xee, 0xee, 0xee), Color(0x00, 0x55, 
 constexpr const char* termcmd[] = {"alacritty", nullptr};
 
 static std::vector<std::string> tagNames = {
+    "T", "q", "w", "n", "d", "s", "a", "z",
+    "t", "f", "c", "g", "v", "h"
 };
 
 static std::vector<bool> defaultTagVisibility = {
-    true, true, true, false,
+    true, true, true, false, false, false, false,
+    false, false, false, false, false, false, false
 };
 
 constexpr Button buttons[] = {
