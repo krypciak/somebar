@@ -243,7 +243,7 @@ void Bar::render()
 void Bar::renderTags()
 {
 	for (auto &tag : _tags) {
-        if(!tag.visible) continue;
+        if(!tag.visible && !(tag.state & TagState::Active)) continue;
 		setColorScheme(
 			tag.state & TagState::Active ? colorActive : colorInactive,
 			tag.state & TagState::Urgent);
