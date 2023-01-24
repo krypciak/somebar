@@ -325,7 +325,7 @@ void Bar::renderComponent(BarComponent& component, ComponentType type)
 	beginBg(type);
 	cairo_rectangle(_painter, _x, 0, size, _bufs->height);
 	cairo_fill(_painter);
-	cairo_move_to(_painter, _x+paddingX, paddingY);
+	cairo_move_to(_painter, _x+paddingX, type == Status ? paddingY - 10 : paddingY);
 
 	beginFg(type);
 	pango_cairo_show_layout(_painter, component.pangoLayout.get());
