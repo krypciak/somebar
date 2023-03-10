@@ -26,6 +26,7 @@ struct Tag {
 	int numClients;
 	int focusedClient;
 	BarComponent component;
+    bool visible;
 };
 
 struct Monitor;
@@ -54,9 +55,9 @@ class Bar {
 
 	// low-level rendering
 	void setColorScheme(const ColorScheme& scheme, bool invert = false);
-	void beginFg();
-	void beginBg();
-	void renderComponent(BarComponent& component);
+	void beginFg(ComponentType type);
+	void beginBg(ComponentType type);
+	void renderComponent(BarComponent& component, ComponentType type);
 	BarComponent createComponent(const std::string& initial = {});
 public:
 	Bar();
