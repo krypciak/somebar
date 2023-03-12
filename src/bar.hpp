@@ -24,6 +24,7 @@ public:
 struct Tag {
 	int state;
 	int numClients;
+	int floatingClients;
 	int focusedClient;
 	BarComponent component;
     bool visible;
@@ -41,6 +42,7 @@ class Bar {
 	std::vector<Tag> _tags;
 	BarComponent _layoutCmp, _titleCmp, _statusCmp;
 	bool _selected;
+    bool _dark;
 	bool _invalid {false};
 
 	// only vaild during render()
@@ -54,10 +56,10 @@ class Bar {
 	void renderStatus();
 
 	// low-level rendering
-	void setColorScheme(const ColorScheme& scheme, bool invert = false);
-	void beginFg(ComponentType type);
-	void beginBg(ComponentType type);
-	void renderComponent(BarComponent& component, ComponentType type);
+	void setColorScheme(const ColorScheme& scheme);
+	void beginFg(ComponentType type, TagState state);
+	void beginBg(ComponentType type, TagState state);
+	void renderComponent(BarComponent& component, ComponentType type, TagState state);
 	BarComponent createComponent(const std::string& initial = {});
 public:
 	Bar();
@@ -65,11 +67,12 @@ public:
 	bool visible() const;
 	void show(wl_output* output);
 	void hide();
-	void setTag(int tag, int state, int numClients, int focusedClient);
+	void setTag(int tag, int state, int numClients, int floatingClients, int focusedClient);
 	void setSelected(bool selected);
 	void setLayout(const std::string& layout);
 	void setTitle(const std::string& title);
 	void setStatus(const std::string& status);
+	void setDark(bool dark);
 	void invalidate();
 	void click(Monitor* mon, int x, int y, int btn);
 };

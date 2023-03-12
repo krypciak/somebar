@@ -17,7 +17,10 @@ struct Color {
 	uint8_t r, g, b, a {255};
 };
 struct ColorScheme {
-	Color tag_fg, tag_bg, 
+	Color 
+          tag_fg_active, tag_bg_active,
+          tag_fg_inactive, tag_bg_inactive, 
+          tag_fg_urgent, tag_bg_urgent, 
           titlebar_fg, titlebar_bg,
           layout_fg, layout_bg,
           status_fg, status_bg;

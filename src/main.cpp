@@ -313,17 +313,28 @@ static void handleStdin(const std::string& line)
 			selmon = nullptr;
 		}
 	} else if (command == "tags") {
-		uint32_t occupied, tags, clientTags, urgent;
-		stream >> occupied >> tags >> clientTags >> urgent;
+		uint32_t occupied, floatingClients, tags, clientTags, urgent;
+		stream >> occupied >> floatingClients >> tags >> clientTags >> urgent;
+
+        bool dark = 1;
 		for (auto i=0u; i<tagNames.size(); i++) {
 			auto tagMask = 1 << i;
 			int state = TagState::None;
-			if (tags & tagMask)
+
+            int numClients = occupied & tagMask ? 1 : 0;
+            int numFloatingClients = floatingClients & tagMask ? 1 : 0;
+			if (tags & tagMask) {
 				state |= TagState::Active;
+                if (numClients - numFloatingClients > 0)
+                    dark = 0;
+            }
 			if (urgent & tagMask)
 				state |= TagState::Urgent;
-			mon->bar.setTag(i, state, occupied & tagMask ? 1 : 0, clientTags & tagMask ? 0 : -1);
+
+			mon->bar.setTag(i, state, numClients, numFloatingClients, clientTags & tagMask ? 0 : -1);
 		}
+        mon->bar.setDark(dark);
+
 		mon->tags = tags;
 	} else if (command == "layout") {
 		auto layout = std::string {};

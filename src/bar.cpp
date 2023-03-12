@@ -89,7 +89,7 @@ Bar::Bar()
 	}
     for(long unsigned int i = 0; i < tagNames.size(); i++) {
         const auto& tagName = tagNames[i];
-		_tags.push_back({ TagState::None, 0, 0, createComponent(tagName), defaultTagVisibility[i] });
+		_tags.push_back({ TagState::None, 0, 0, 0, createComponent(tagName), defaultTagVisibility[i] });
 	}
 	_layoutCmp = createComponent();
 	_titleCmp = createComponent();
@@ -135,11 +135,12 @@ void Bar::hide()
 	_bufs.reset();
 }
 
-void Bar::setTag(int tag, int state, int numClients, int focusedClient)
+void Bar::setTag(int tag, int state, int numClients, int floatingClients, int focusedClient)
 {
 	auto& t = _tags[tag];
 	t.state = state;
 	t.numClients = numClients;
+	t.floatingClients = floatingClients;
 	t.focusedClient = focusedClient;
     t.visible = numClients != 0 || defaultTagVisibility[tag] ;
 }
@@ -227,9 +228,9 @@ void Bar::render()
 	_x = 0;
 
 	renderTags();
-	setColorScheme(_selected ? colorActive : colorInactive);
-	renderComponent(_layoutCmp, Layout);
-	renderComponent(_titleCmp, Titlebar);
+	setColorScheme(colors);
+	renderComponent(_layoutCmp, Layout, None);
+	renderComponent(_titleCmp, Titlebar, None);
 	renderStatus();
 
 	_painter = nullptr;
@@ -244,10 +245,8 @@ void Bar::renderTags()
 {
 	for (auto &tag : _tags) {
         if(!tag.visible && !(tag.state & TagState::Active)) continue;
-		setColorScheme(
-			tag.state & TagState::Active ? colorActive : colorInactive,
-			tag.state & TagState::Urgent);
-		renderComponent(tag.component, Tags);
+		setColorScheme(colors);
+		renderComponent(tag.component, Tags, (TagState) tag.state);
 		auto indicators = std::min(tag.numClients, static_cast<int>(_bufs->height/2));
 		for (auto ind = 0; ind < indicators; ind++) {
 			auto w = ind == tag.focusedClient ? 7 : 1;
@@ -263,52 +262,55 @@ void Bar::renderTags()
 void Bar::renderStatus()
 {
 	pango_cairo_update_layout(_painter, _statusCmp.pangoLayout.get());
-	beginBg(Status);
+	beginBg(Status, None);
 	auto start = _bufs->width - _statusCmp.width() - paddingX*2;
 	cairo_rectangle(_painter, _x, 0, _bufs->width-_x+start, _bufs->height);
 	cairo_fill(_painter);
 
 	_x = start;
-	renderComponent(_statusCmp, Status);
+	renderComponent(_statusCmp, Status, None);
 }
 
-void Bar::setColorScheme(const ColorScheme& scheme, bool invert)
+void Bar::setColorScheme(const ColorScheme& scheme)
 {
-	_colorScheme = invert
-		? ColorScheme {
-            scheme.tag_bg,       scheme.tag_fg,
-            scheme.titlebar_bg,  scheme.titlebar_fg,
-            scheme.layout_bg,    scheme.layout_fg,
-            scheme.status_bg,    scheme.status_fg,
-        }
-		: ColorScheme {
-            scheme.tag_fg,       scheme.tag_bg, 
-            scheme.titlebar_fg,  scheme.titlebar_bg,
-            scheme.layout_fg,    scheme.layout_bg,
-            scheme.status_fg,    scheme.status_bg,
-        };
+	_colorScheme = scheme;
 }
 static void setColor(cairo_t* painter, const Color& color)
 {
 	cairo_set_source_rgba(painter,
 		color.r/255.0, color.g/255.0, color.b/255.0, color.a/255.0);
 }
-void Bar::beginFg(ComponentType type)
+void Bar::beginFg(ComponentType type, TagState state)
 {
     Color color;
     switch(type) {
-        case Tags:     color = _colorScheme.tag_fg;      break;
+        case Tags: 
+            if (state & TagState::Urgent)
+                color = _colorScheme.tag_fg_urgent; 
+            else if (state & TagState::Active)
+                color = _colorScheme.tag_fg_active;
+            else  color = _colorScheme.tag_fg_inactive; 
+            break;
         case Titlebar: color = _colorScheme.titlebar_fg; break;
         case Layout:   color = _colorScheme.layout_fg;   break;
         case Status:   color = _colorScheme.status_fg;   break;
     };
 	setColor(_painter, color);
 }
-void Bar::beginBg(ComponentType type)
+void Bar::beginBg(ComponentType type, TagState state)
 {
     Color color;
-    switch(type) {
-        case Tags:     color = _colorScheme.tag_bg;      break;
+
+    if (_dark && !(state & TagState::Urgent || state & TagState::Active))
+        color = Color(0x00, 0x00, 0x00);
+    else switch(type) {
+        case Tags: 
+            if (state & TagState::Urgent)
+                color = _colorScheme.tag_bg_urgent; 
+            else if (state & TagState::Active)
+                color = _colorScheme.tag_bg_active;
+            else  color = _colorScheme.tag_bg_inactive; 
+            break;
         case Titlebar: color = _colorScheme.titlebar_bg; break;
         case Layout:   color = _colorScheme.layout_bg;   break;
         case Status:   color = _colorScheme.status_bg;   break;
@@ -316,18 +318,23 @@ void Bar::beginBg(ComponentType type)
 	setColor(_painter, color);
 }
 
-void Bar::renderComponent(BarComponent& component, ComponentType type)
+void Bar::setDark(bool dark)
+{
+    _dark = dark;
+}
+
+void Bar::renderComponent(BarComponent& component, ComponentType type, TagState state)
 {
 	pango_cairo_update_layout(_painter, component.pangoLayout.get());
 	auto size = component.width() + paddingX*2;
 	component.x = _x;
 
-	beginBg(type);
+	beginBg(type, state);
 	cairo_rectangle(_painter, _x, 0, size, _bufs->height);
 	cairo_fill(_painter);
 	cairo_move_to(_painter, _x+paddingX, paddingY);
 
-	beginFg(type);
+	beginFg(type, state);
 	pango_cairo_show_layout(_painter, component.pangoLayout.get());
 	_x += size;
 }
