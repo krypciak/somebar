@@ -18,6 +18,8 @@
 #include <linux/input-event-codes.h>
 #include <wayland-client.h>
 #include <wayland-cursor.h>
+#include <iostream>
+#include <fstream>
 #include "wlr-layer-shell-unstable-v1-client-protocol.h"
 #include "xdg-output-unstable-v1-client-protocol.h"
 #include "xdg-shell-client-protocol.h"
@@ -333,6 +335,15 @@ static void handleStdin(const std::string& line)
 
 			mon->bar.setTag(i, state, numClients, numFloatingClients, clientTags & tagMask ? 0 : -1);
 		}
+        
+        if(dark) {
+            std::ifstream file;
+            std::string homedir = getenv("HOME");
+            file.open(homedir + "/.config/wallpapers/selected");
+            std::string wallpaper;
+            std::getline(file, wallpaper);
+            dark = wallpaper == "oneshot/main.png" ? true : false;
+        }
         mon->bar.setDark(dark);
 
 		mon->tags = tags;
