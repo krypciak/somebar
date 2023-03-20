@@ -19,11 +19,11 @@ struct Color {
 struct ColorScheme {
 	Color 
           tag_fg_active, tag_bg_active,
-          tag_fg_inactive, tag_bg_inactive, 
+          tag_fg_inactive, tag_bg_inactive, tag_bg_inactive_unselected, 
           tag_fg_urgent, tag_bg_urgent, 
-          titlebar_fg, titlebar_bg,
-          layout_fg, layout_bg,
-          status_fg, status_bg;
+          titlebar_fg, titlebar_bg, titlebar_bg_unselected,
+          layout_fg, layout_bg, layout_bg_unselected,
+          status_fg, status_bg, status_bg_unselected;
 };
 enum ComponentType { Tags, Titlebar, Layout, Status };
 

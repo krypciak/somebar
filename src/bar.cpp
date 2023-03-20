@@ -309,11 +309,12 @@ void Bar::beginBg(ComponentType type, TagState state)
                 color = _colorScheme.tag_bg_urgent; 
             else if (state & TagState::Active)
                 color = _colorScheme.tag_bg_active;
-            else  color = _colorScheme.tag_bg_inactive; 
+            else  
+                color = _selected ? _colorScheme.tag_bg_inactive : _colorScheme.tag_bg_inactive_unselected;
             break;
-        case Titlebar: color = _colorScheme.titlebar_bg; break;
-        case Layout:   color = _colorScheme.layout_bg;   break;
-        case Status:   color = _colorScheme.status_bg;   break;
+        case Titlebar: color = _selected ? _colorScheme.titlebar_bg : _colorScheme.titlebar_bg_unselected; break;
+        case Layout:   color = _selected ? _colorScheme.layout_bg : _colorScheme.layout_bg_unselected;   break;
+        case Status:   color = _selected ? _colorScheme.status_bg : _colorScheme.status_bg_unselected;   break;
     };
 	setColor(_painter, color);
 }

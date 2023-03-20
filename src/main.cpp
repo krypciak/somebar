@@ -342,7 +342,7 @@ static void handleStdin(const std::string& line)
             file.open(homedir + "/.config/wallpapers/selected");
             std::string wallpaper;
             std::getline(file, wallpaper);
-            dark = wallpaper == "oneshot/main.png" ? true : false;
+            dark = (wallpaper == "oneshot/main.png" || wallpaper == "#000000") ? true : false;
         }
         mon->bar.setDark(dark);
 
