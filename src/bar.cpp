@@ -301,7 +301,7 @@ void Bar::beginBg(ComponentType type, TagState state)
 {
     Color color;
 
-    if (_dark && !(state & TagState::Urgent || state & TagState::Active))
+    if (_dark && !(state & TagState::Urgent || state & TagState::Active) && (type != Layout || _selected))
         color = Color(0x00, 0x00, 0x00);
     else switch(type) {
         case Tags: 
