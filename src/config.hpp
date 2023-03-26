@@ -41,8 +41,8 @@ static std::vector<std::string> tagNames = {
 };
 
 static std::vector<bool> defaultTagVisibility = {
-    true, true, true, false, false, false, false,
-    false, false, false, false, false, false, false
+    true, true, true, false, false, false, false, 
+    false, false, false, false, false, false, false, false
 };
 
 constexpr Button buttons[] = {
