@@ -36,12 +36,12 @@ constexpr ColorScheme colors = {
 constexpr const char* termcmd[] = {"alacritty", nullptr};
 
 static std::vector<std::string> tagNames = {
-    "T", "q", "w", "n", "d", "s", "a", "z",
+    "T", "q", "w", "e", "n", "d", "s", "a", "z",
     "t", "f", "c", "g", "v", "h"
 };
 
 static std::vector<bool> defaultTagVisibility = {
-    true, true, true, false, false, false, false, 
+    true, true, true, true, false, false, false, false, 
     false, false, false, false, false, false, false, false
 };
 
